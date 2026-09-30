@@ -1,0 +1,296 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "maternal_record.schema.json",
+  "title": "MaternalANCRecord",
+  "description": "Flat JSON schema v1 for Antenatal Care records captured by ASHA/ANM field workers. Covers vitals, lab results, obstetric history, nutrition, and PMSMA high-risk flags.",
+  "type": "object",
+  "required": [
+    "record_id",
+    "beneficiary_id",
+    "worker_id",
+    "anc_contact_number",
+    "visit_date",
+    "vitals",
+    "lab_results",
+    "obstetric_history",
+    "nutrition",
+    "pmsma_flags",
+    "sync_status"
+  ],
+  "properties": {
+    "record_id": {
+      "type": "string",
+      "description": "UUID v4 generated client-side at record creation",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+    },
+    "beneficiary_id": {
+      "type": "string",
+      "description": "Unique beneficiary identifier (RCH ID or local ID)"
+    },
+    "worker_id": {
+      "type": "string",
+      "description": "ASHA or ANM worker identifier"
+    },
+    "worker_role": {
+      "type": "string",
+      "enum": ["ASHA", "ANM", "MO", "Anganwadi"],
+      "description": "Role of the data entry worker"
+    },
+    "anc_contact_number": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 8,
+      "description": "ANC contact number per WHO 8-contact schedule (1–8)"
+    },
+    "visit_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date of ANC contact in ISO 8601 format (YYYY-MM-DD)"
+    },
+    "visit_location": {
+      "type": "object",
+      "properties": {
+        "latitude": { "type": "number" },
+        "longitude": { "type": "number" },
+        "place_name": { "type": "string" }
+      }
+    },
+    "vitals": {
+      "type": "object",
+      "required": ["systolic_bp", "diastolic_bp", "weight_kg"],
+      "properties": {
+        "systolic_bp": {
+          "type": "number",
+          "minimum": 60,
+          "maximum": 250,
+          "description": "Systolic blood pressure in mmHg"
+        },
+        "diastolic_bp": {
+          "type": "number",
+          "minimum": 40,
+          "maximum": 150,
+          "description": "Diastolic blood pressure in mmHg"
+        },
+        "weight_kg": {
+          "type": "number",
+          "minimum": 25,
+          "maximum": 150,
+          "description": "Maternal weight in kilograms"
+        },
+        "fundal_height_cm": {
+          "type": "number",
+          "minimum": 10,
+          "maximum": 45,
+          "description": "Fundal height in centimeters"
+        },
+        "oedema_present": {
+          "type": "boolean",
+          "description": "Clinical observation of oedema"
+        },
+        "oedema_severity": {
+          "type": "string",
+          "enum": ["none", "mild", "moderate", "severe"],
+          "description": "Oedema severity grading"
+        },
+        "pulse_rate_bpm": {
+          "type": "number",
+          "minimum": 40,
+          "maximum": 200
+        },
+        "fetal_heart_rate_bpm": {
+          "type": "number",
+          "minimum": 80,
+          "maximum": 200
+        }
+      }
+    },
+    "lab_results": {
+      "type": "object",
+      "properties": {
+        "hemoglobin_gdl": {
+          "type": "number",
+          "minimum": 3,
+          "maximum": 20,
+          "description": "Hemoglobin in g/dL"
+        },
+        "anemia_grade": {
+          "type": "string",
+          "enum": ["none", "mild", "moderate", "severe"],
+          "description": "Derived anemia grade: none≥11, mild 10–10.9, moderate 7–9.9, severe<7"
+        },
+        "fasting_blood_sugar_mgdl": {
+          "type": "number",
+          "description": "Fasting blood sugar in mg/dL"
+        },
+        "pp_blood_sugar_mgdl": {
+          "type": "number",
+          "description": "Post-prandial blood sugar in mg/dL"
+        },
+        "urine_albumin": {
+          "type": "string",
+          "enum": ["nil", "trace", "1+", "2+", "3+", "4+"],
+          "description": "Urine albumin dipstick result"
+        },
+        "urine_sugar": {
+          "type": "string",
+          "enum": ["nil", "trace", "1+", "2+", "3+"],
+          "description": "Urine sugar dipstick result"
+        },
+        "hiv_status": {
+          "type": "string",
+          "enum": ["negative", "positive", "not_tested", "refused"],
+          "description": "HIV screening result"
+        },
+        "vdrl_status": {
+          "type": "string",
+          "enum": ["non_reactive", "reactive", "not_tested"],
+          "description": "VDRL/syphilis screening result"
+        },
+        "blood_group": {
+          "type": "string",
+          "pattern": "^(A|B|AB|O)[+-]$"
+        }
+      }
+    },
+    "obstetric_history": {
+      "type": "object",
+      "required": ["gravida", "para", "lmp"],
+      "properties": {
+        "gravida": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Number of pregnancies including current"
+        },
+        "para": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of deliveries after 20 weeks"
+        },
+        "lmp": {
+          "type": "string",
+          "format": "date",
+          "description": "Last menstrual period date"
+        },
+        "edd": {
+          "type": "string",
+          "format": "date",
+          "description": "Estimated date of delivery (Naegele's rule)"
+        },
+        "gestational_age_weeks": {
+          "type": "number",
+          "minimum": 4,
+          "maximum": 45
+        },
+        "previous_stillbirth": { "type": "boolean" },
+        "previous_neonatal_death": { "type": "boolean" },
+        "previous_cesarean": { "type": "boolean" },
+        "previous_preterm_birth": { "type": "boolean" },
+        "previous_low_birth_weight": { "type": "boolean" },
+        "previous_postpartum_hemorrhage": { "type": "boolean" },
+        "number_of_abortions": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "nutrition": {
+      "type": "object",
+      "properties": {
+        "ifa_tablets_distributed": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of IFA (Iron-Folic Acid) tablets given this visit"
+        },
+        "ifa_tablets_consumed_last_month": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 31
+        },
+        "ifa_compliance": {
+          "type": "string",
+          "enum": ["good", "partial", "poor", "not_started"],
+          "description": "Self-reported IFA compliance"
+        },
+        "calcium_tablets_given": { "type": "boolean" },
+        "tt_vaccination_status": {
+          "type": "string",
+          "enum": ["not_given", "tt1_given", "tt2_given", "tt_booster_given"],
+          "description": "Tetanus Toxoid vaccination status"
+        },
+        "dietary_counseling_done": { "type": "boolean" },
+        "muac_cm": {
+          "type": "number",
+          "description": "Mid-upper arm circumference in cm — indicator of maternal nutritional status"
+        }
+      }
+    },
+    "pmsma_flags": {
+      "type": "object",
+      "description": "PMSMA 25 high-risk category flags — auto-evaluated by risk engine",
+      "properties": {
+        "severe_anemia": { "type": "boolean" },
+        "moderate_anemia": { "type": "boolean" },
+        "hypertension": { "type": "boolean" },
+        "pre_eclampsia": { "type": "boolean" },
+        "eclampsia": { "type": "boolean" },
+        "gestational_diabetes": { "type": "boolean" },
+        "hypothyroidism": { "type": "boolean" },
+        "hyperthyroidism": { "type": "boolean" },
+        "heart_disease": { "type": "boolean" },
+        "renal_disease": { "type": "boolean" },
+        "epilepsy": { "type": "boolean" },
+        "hiv_positive": { "type": "boolean" },
+        "syphilis_reactive": { "type": "boolean" },
+        "hepatitis_b_carrier": { "type": "boolean" },
+        "previous_cesarean": { "type": "boolean" },
+        "previous_stillbirth_nnd": { "type": "boolean" },
+        "grand_multipara": { "type": "boolean" },
+        "elderly_primigravida": { "type": "boolean" },
+        "short_stature": { "type": "boolean" },
+        "malpresentation": { "type": "boolean" },
+        "multiple_pregnancy": { "type": "boolean" },
+        "iugr_suspected": { "type": "boolean" },
+        "bad_obstetric_history": { "type": "boolean" },
+        "postdatism": { "type": "boolean" },
+        "other_high_risk": { "type": "boolean" }
+      }
+    },
+    "risk_summary": {
+      "type": "object",
+      "description": "Computed by backend risk engine — not set by frontend",
+      "properties": {
+        "total_flags_active": { "type": "integer" },
+        "risk_level": {
+          "type": "string",
+          "enum": ["low", "moderate", "high", "critical"]
+        },
+        "referral_recommended": { "type": "boolean" },
+        "referral_facility": { "type": "string" },
+        "risk_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "computed_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "sync_status": {
+      "type": "string",
+      "enum": ["pending", "synced", "failed"],
+      "description": "Offline sync state managed by frontend sync queue"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of record creation (client-side)"
+    },
+    "synced_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when record was successfully synced"
+    }
+  }
+}
