@@ -34,3 +34,6 @@ node_modules/
 
 # Logs
 *.log
+
+# Profile README (separate repo)
+profile_readme/
